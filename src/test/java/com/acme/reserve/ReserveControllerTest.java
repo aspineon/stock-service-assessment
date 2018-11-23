@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mapping.context.MappingContext;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ReserveController.class)
+@AutoConfigureRestDocs(outputDir = "target/snippets")
 public class ReserveControllerTest {
     @MockBean
     ReservedStockRepository repository;
@@ -37,7 +40,7 @@ public class ReserveControllerTest {
     MockMvc mockMvc;
 
     @MockBean
-    MappingContext mappingContext; // Needed for jpaAuditingHandler
+    MappingContext mappingContext; // XXX Needed for jpaAuditingHandler; debug/fix later
 
     @Test
     public void testReserveOk() throws Exception {
@@ -52,7 +55,8 @@ public class ReserveControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(reservedStock.getId().toString()))
-                .andExpect(jsonPath("$.createdDate").value(reservedStock.getCreatedDate()));
+                .andExpect(jsonPath("$.createdDate").value(reservedStock.getCreatedDate()))
+                .andDo(document("reserve"));
         verify(service).reserve(request);
     }
 
@@ -64,7 +68,8 @@ public class ReserveControllerTest {
                 .content(mapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Not enough items in stock"));
+                .andExpect(status().reason("Not enough items in stock"))
+                .andDo(document("reserve-not-enough"));
     }
 
     @Test
@@ -73,7 +78,8 @@ public class ReserveControllerTest {
         mockMvc.perform(post("/reserved-stock/sell")
                 .content(mapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("sell"));
         verify(service).sellReservedStock(request);
     }
 
@@ -98,7 +104,8 @@ public class ReserveControllerTest {
         mockMvc.perform(get("/reserved-stock/find")
                 .param("branch", branch.toString())
                 .param("product", product.toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("find"));
     }
 
     @Test
@@ -114,14 +121,23 @@ public class ReserveControllerTest {
     }
 
     @Test
-    public void testListOk() throws Exception {
-        UUID branch = UUID.randomUUID();
-        UUID product = UUID.randomUUID();
+    public void testFindCreatedByOk() throws Exception {
         ReservedStock response = new ReservedStock();
-        when(repository.findAll()).thenReturn(Collections.singletonList(response));
+        when(repository.findByCreatedBy("testuser")).thenReturn(Collections.singletonList(response));
+        mockMvc.perform(get("/reserved-stock/findCreatedBy")
+                .param("createdBy", "testuser"))
+                .andExpect(status().isOk())
+                .andDo(document("findCreatedBy"));
+    }
+
+    @Test
+    public void testListOk() throws Exception {
+        ReservedStock response = new ReservedStock();
+        when(service.findAll()).thenReturn(Collections.singletonList(response));
         mockMvc.perform(get("/reserved-stock/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isNotEmpty());
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andDo(document("list"));
     }
 
     @Test

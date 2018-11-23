@@ -2,5 +2,3 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: true
-    deserialization:
-      adjust-dates-to-context-time-zone: false

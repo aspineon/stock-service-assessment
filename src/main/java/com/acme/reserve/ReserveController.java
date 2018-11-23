@@ -37,15 +37,15 @@ class ReserveController {
         service.sellReservedStock(request);
     }
 
+    @GetMapping("/list")
+    public List<ReservedStockResponse> listAll() {
+        return service.findAll().stream().map(ReservedStockResponse::new).collect(Collectors.toList());
+    }
+
     @GetMapping("/find")
     public ReservedStockResponse find(@RequestParam UUID branch, @RequestParam UUID product) throws ReservedStockNotFound {
         return repository.findByBranchAndProduct(branch, product).map(ReservedStockResponse::new)
                 .orElseThrow(() -> new ReservedStockNotFound("branch: " + branch + ", product: " + product));
-    }
-
-    @GetMapping("/list")
-    public List<ReservedStockResponse> listAll() {
-        return repository.findAll().stream().map(ReservedStockResponse::new).collect(Collectors.toList());
     }
 
     /**
@@ -54,8 +54,8 @@ class ReserveController {
      * @param createdBy
      * @return
      */
-    @GetMapping(value = "/listCreatedBy")
-    public List<ReservedStockResponse> listCreatedBy(@RequestParam String createdBy) {
+    @GetMapping(value = "/findCreatedBy")
+    public List<ReservedStockResponse> findCreatedBy(@RequestParam String createdBy) { // XXX Use active principal(?)
         return repository.findByCreatedBy(createdBy).stream().map(ReservedStockResponse::new).collect(Collectors.toList());
     }
 }
@@ -72,6 +72,7 @@ class ReserveStockRequest {
 }
 
 @Value
+// TODO HATEOAS through ResourceSupport
 class ReservedStockResponse {
     UUID id;
     UUID branch;

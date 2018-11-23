@@ -71,7 +71,7 @@ public class ReservedStockService {
             throw new ReservedStockNotFound(request.toString());
         }
         repository.deleteById(request.getId());
-        // XXX Consider publishing an event here if we don't end up using @DomainEvents for that
+        // XXX Consider publishing an event here if we don't end up using Spring Data @DomainEvents
     }
 
     public List<ReservedStock> findAll() {
