@@ -3,8 +3,7 @@ package com.acme.reserve;
 import com.acme.reserve.exceptions.ReservedStockNotFound;
 import com.acme.stock.exceptions.NotEnoughInStock;
 import com.acme.stock.exceptions.StockNotFound;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +59,9 @@ class ReserveController {
     }
 }
 
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Validated
 class ReserveStockRequest {
     @NotNull
@@ -91,7 +92,9 @@ class ReservedStockResponse {
     }
 }
 
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Validated
 class SellRequest {
     UUID id;

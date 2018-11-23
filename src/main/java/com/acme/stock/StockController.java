@@ -3,9 +3,7 @@ package com.acme.stock;
 import com.acme.stock.exceptions.NotEnoughInStock;
 import com.acme.stock.exceptions.StockNotFound;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,10 +41,4 @@ class StockController {
     public List<StockResponse> listAll() {
         return repository.findAll().stream().map(StockResponse::new).collect(Collectors.toList());
     }
-}
-
-@Value
-@Validated
-class SellRequest {
-    UUID id;
 }
