@@ -17,7 +17,7 @@ class StockWebController {
     public String stocks(Model model) {
         model.addAttribute("name", "testuser");
         List<StockResponse> stockResponses = service.findAll().stream().map(StockResponse::new).collect(Collectors.toList());
-        model.addAttribute("reserved", stockResponses);
+        model.addAttribute("stocks", stockResponses);
         return "stocks";
     }
 

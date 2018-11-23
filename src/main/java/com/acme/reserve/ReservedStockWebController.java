@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 class ReservedStockWebController {
     final ReservedStockService service;
 
-    @GetMapping("/stocks")
+    @GetMapping("/reservedstocks")
     public String stocks(Model model) {
         model.addAttribute("name", "testuser");
         List<ReservedStockResponse> stockResponses = service.findAll().stream().map(ReservedStockResponse::new).collect(Collectors.toList());
-        model.addAttribute("stocks", stockResponses);
-        return "stocks";
+        model.addAttribute("reservedstocks", stockResponses);
+        return "reservedstocks";
     }
 
 }
