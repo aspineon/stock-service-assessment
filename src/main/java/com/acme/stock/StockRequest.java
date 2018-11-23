@@ -10,7 +10,7 @@ import javax.validation.constraints.Positive;
 
 @Value
 @Validated
-public class RemoveFromStockRequest {
+public class StockRequest {
     @NotNull
     UUID branch;
     @NotNull

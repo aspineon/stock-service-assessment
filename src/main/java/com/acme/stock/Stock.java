@@ -32,5 +32,5 @@ class Stock {
     private UUID branch;
 
     @Min(0)
-    private int numberOfItems;
+    private int numberOfItems = 0;
 }

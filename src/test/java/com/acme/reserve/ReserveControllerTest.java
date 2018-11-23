@@ -1,5 +1,6 @@
 package com.acme.reserve;
 
+import com.acme.reserve.exceptions.ReservedStockNotFound;
 import com.acme.stock.exceptions.NotEnoughInStock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -11,12 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Date;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -30,11 +31,27 @@ public class ReserveControllerTest {
     MockMvc mockMvc;
 
     @Test
-    public void testNotEnoughInStock() throws Exception {
-        doThrow(new NotEnoughInStock("I have, like, 12")).when(service).reserve(any(ReserveStockRequest.class));
+    public void testReserveOk() throws Exception {
+        ReserveStockRequest request = new ReserveStockRequest(UUID.randomUUID(), UUID.randomUUID(), 1);
+        ReservedStock reservedStock = new ReservedStock();
+        reservedStock.setId(UUID.randomUUID());
+        reservedStock.setExpires(new Date());
+        when(service.reserve(request)).thenReturn(reservedStock);
 
+        mockMvc.perform(post("/reserved-stock/reserve")
+                .content(mapper.writeValueAsBytes(request))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.id").value(reservedStock.getId().toString()))
+                .andExpect(jsonPath("$.expires").value(reservedStock.getExpires()));
+        verify(service).reserve(request);
+    }
+
+    @Test
+    public void testReserve_NotEnoughInStock() throws Exception {
         ReserveStockRequest request = new ReserveStockRequest(UUID.randomUUID(), UUID.randomUUID(), 1000);
-        mockMvc.perform(post("/reserve/stock")
+        when(service.reserve(request)).thenThrow(new NotEnoughInStock("I have, like, 12"));
+        mockMvc.perform(post("/reserved-stock/reserve")
                 .content(mapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -42,13 +59,25 @@ public class ReserveControllerTest {
     }
 
     @Test
-    public void testReserveOk() throws Exception {
-        ReserveStockRequest request = new ReserveStockRequest(UUID.randomUUID(), UUID.randomUUID(), 1);
-        mockMvc.perform(post("/reserve/stock")
+    public void testSellOk() throws Exception {
+        SellRequest request = new SellRequest(UUID.randomUUID());
+        mockMvc.perform(post("/reserved-stock/sell")
                 .content(mapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isAccepted());
-        verify(service).reserve(request);
+                .andExpect(status().isOk());
+        verify(service).sellReservedStock(request);
+    }
+
+    @Test
+    public void testSell_NotFound() throws Exception {
+        SellRequest request = new SellRequest(UUID.randomUUID());
+        doThrow(new ReservedStockNotFound("Reserved three weeks ago you said?")).when(service).sellReservedStock(request);
+
+        mockMvc.perform(post("/reserved-stock/sell")
+                .content(mapper.writeValueAsBytes(request))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason("Reserved stock not found"));
     }
 
 }

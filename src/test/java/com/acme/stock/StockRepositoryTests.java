@@ -13,8 +13,6 @@
 
 package com.acme.stock;
 
-import com.acme.stock.Stock;
-import com.acme.stock.StockRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,6 +69,9 @@ public class StockRepositoryTests {
 
     @Test
     public void testCanNotStoreBranchProductTwice() {
+        expect.expect(DataIntegrityViolationException.class);
+        expect.expectMessage(containsString("UC_STOCK"));
+
         UUID branch = UUID.randomUUID();
         UUID product = UUID.randomUUID();
         Stock stock1 = new Stock();
@@ -83,9 +84,6 @@ public class StockRepositoryTests {
         stock2.setProduct(product);
         stock2.setNumberOfItems(2);
         repository.save(stock2);
-
-        expect.expect(DataIntegrityViolationException.class);
-        expect.expectMessage(containsString("UC_STOCK"));
         repository.flush();
         fail("Should not be allowed to store branch and product combination twice");
     }

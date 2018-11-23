@@ -42,9 +42,9 @@ class ReservedStock {
     @NotNull
     private Date expires;
 
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     @CreatedDate
-    private Date createdDate;
+    private Date createdDate = new Date();
     @CreatedBy
     private String createdBy;
     @LastModifiedDate
