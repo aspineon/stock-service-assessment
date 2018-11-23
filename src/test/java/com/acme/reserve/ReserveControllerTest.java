@@ -12,10 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ReserveController.class)
 public class ReserveControllerTest {
+    @MockBean
+    ReservedStockRepository repository;
     @MockBean
     ReserveService service;
     @Autowired
@@ -35,15 +40,15 @@ public class ReserveControllerTest {
         ReserveStockRequest request = new ReserveStockRequest(UUID.randomUUID(), UUID.randomUUID(), 1);
         ReservedStock reservedStock = new ReservedStock();
         reservedStock.setId(UUID.randomUUID());
-        reservedStock.setExpires(new Date());
+        reservedStock.setCreatedDate(new Date());
         when(service.reserve(request)).thenReturn(reservedStock);
 
         mockMvc.perform(post("/reserved-stock/reserve")
                 .content(mapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isAccepted())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(reservedStock.getId().toString()))
-                .andExpect(jsonPath("$.expires").value(reservedStock.getExpires()));
+                .andExpect(jsonPath("$.createdDate").value(reservedStock.getCreatedDate()));
         verify(service).reserve(request);
     }
 
@@ -64,7 +69,7 @@ public class ReserveControllerTest {
         mockMvc.perform(post("/reserved-stock/sell")
                 .content(mapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
         verify(service).sellReservedStock(request);
     }
 
@@ -80,4 +85,48 @@ public class ReserveControllerTest {
                 .andExpect(status().reason("Reserved stock not found"));
     }
 
+    @Test
+    public void testFindOk() throws Exception {
+        UUID branch = UUID.randomUUID();
+        UUID product = UUID.randomUUID();
+        ReservedStock response = new ReservedStock();
+        when(repository.findByBranchAndProduct(branch, product)).thenReturn(Optional.of(response));
+        mockMvc.perform(get("/reserved-stock/find")
+                .param("branch", branch.toString())
+                .param("product", product.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testFind_NotFound() throws Exception {
+        UUID branch = UUID.randomUUID();
+        UUID product = UUID.randomUUID();
+        when(repository.findByBranchAndProduct(branch, product)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/reserved-stock/find")
+                .param("branch", branch.toString())
+                .param("product", product.toString()))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason("Reserved stock not found"));
+    }
+
+    @Test
+    public void testListOk() throws Exception {
+        UUID branch = UUID.randomUUID();
+        UUID product = UUID.randomUUID();
+        ReservedStock response = new ReservedStock();
+        when(repository.findAll()).thenReturn(Collections.singletonList(response));
+        mockMvc.perform(get("/reserved-stock/list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+    @Test
+    public void testList_empty() throws Exception {
+        UUID branch = UUID.randomUUID();
+        UUID product = UUID.randomUUID();
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/reserved-stock/list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
 }

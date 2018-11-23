@@ -24,12 +24,18 @@ class Stock {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @NaturalId
-    @NotNull
-    private UUID product;
+    /**
+     * Reference branch only by external identifier.
+     */
     @NaturalId
     @NotNull
     private UUID branch;
+    /**
+     * Reference product only by external identifier.
+     */
+    @NaturalId
+    @NotNull
+    private UUID product;
 
     @Min(0)
     private int numberOfItems = 0;

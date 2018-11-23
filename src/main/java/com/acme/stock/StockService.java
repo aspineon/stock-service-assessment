@@ -12,9 +12,10 @@ public class StockService {
     final StockRepository repository;
 
     @Transactional
-    public void addToStock(StockRequest addRequest) {
+    public Stock addToStock(StockRequest addRequest) {
         Stock stock = repository.findByBranchAndProduct(addRequest.getBranch(), addRequest.getProduct())
                 .orElseGet(() -> {
+                    // Create new records if there is no previous record to update
                     Stock newStock = new Stock();
                     newStock.setBranch(addRequest.getBranch());
                     newStock.setProduct(addRequest.getProduct());
@@ -23,11 +24,11 @@ public class StockService {
         int numberAdded = addRequest.getNumberOfItems();
         int numberOfItems = stock.getNumberOfItems();
         stock.setNumberOfItems(numberOfItems + numberAdded);
-        repository.save(stock);
+        return repository.save(stock);
     }
 
     @Transactional
-    public void removeFromStock(StockRequest removeRequest) throws StockNotFound, NotEnoughInStock {
+    public Stock removeFromStock(StockRequest removeRequest) throws StockNotFound, NotEnoughInStock {
         Stock stock = repository.findByBranchAndProduct(removeRequest.getBranch(), removeRequest.getProduct())
                 .orElseThrow(() -> new StockNotFound(removeRequest.toString()));
         int numberRequested = removeRequest.getNumberOfItems();
@@ -36,6 +37,6 @@ public class StockService {
             throw new NotEnoughInStock(removeRequest + " exceeds " + stock);
         }
         stock.setNumberOfItems(numberInStock - numberRequested);
-        repository.save(stock);
+        return repository.save(stock);
     }
 }

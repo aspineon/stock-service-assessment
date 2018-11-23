@@ -3,7 +3,6 @@ package com.acme.reserve;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -29,21 +28,17 @@ class ReservedStock {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @NaturalId
     @NotNull
     private UUID product;
-    @NaturalId
     @NotNull
     private UUID branch;
 
     @Positive
     private int numberOfItems;
 
-    @NotNull
-    private Date expires;
-
     @Column(updatable = false)
     @CreatedDate
+    @NotNull
     private Date createdDate = new Date();
     @CreatedBy
     private String createdBy;

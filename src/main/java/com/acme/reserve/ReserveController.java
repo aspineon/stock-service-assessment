@@ -10,7 +10,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -19,19 +21,42 @@ import javax.validation.constraints.Positive;
 @RequiredArgsConstructor
 @RequestMapping("/reserved-stock")
 class ReserveController {
+    final ReservedStockRepository repository;
     final ReserveService service;
 
-    @PostMapping(value = "/reserve")
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    @PostMapping("/reserve")
+    @ResponseStatus(code = HttpStatus.CREATED)
     public ReservedStockResponse reserveStock(@RequestBody ReserveStockRequest request) throws StockNotFound, NotEnoughInStock {
-        ReservedStock reservedStock = service.reserve(request);
-        return new ReservedStockResponse(reservedStock.getId(), reservedStock.getExpires());
+        ReservedStock reserved = service.reserve(request);
+        return new ReservedStockResponse(reserved);
     }
 
-    @PostMapping(value = "/sell")
-    @ResponseStatus(code = HttpStatus.OK)
+    @PostMapping("/sell")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void reserveStock(@RequestBody SellRequest request) throws ReservedStockNotFound {
         service.sellReservedStock(request);
+    }
+
+    @GetMapping("/find")
+    public ReservedStockResponse find(@RequestParam UUID branch, @RequestParam UUID product) throws ReservedStockNotFound {
+        return repository.findByBranchAndProduct(branch, product).map(ReservedStockResponse::new)
+                .orElseThrow(() -> new ReservedStockNotFound("branch: " + branch + ", product: " + product));
+    }
+
+    @GetMapping("/list")
+    public List<ReservedStockResponse> listAll() {
+        return repository.findAll().stream().map(ReservedStockResponse::new).collect(Collectors.toList());
+    }
+
+    /**
+     * Allows employees to see the reservations they created.
+     *
+     * @param createdBy
+     * @return
+     */
+    @GetMapping(value = "/listCreatedBy")
+    public List<ReservedStockResponse> listCreatedBy(@RequestParam String createdBy) {
+        return repository.findByCreatedBy(createdBy).stream().map(ReservedStockResponse::new).collect(Collectors.toList());
     }
 }
 
@@ -39,9 +64,9 @@ class ReserveController {
 @Validated
 class ReserveStockRequest {
     @NotNull
-    UUID product;
-    @NotNull
     UUID branch;
+    @NotNull
+    UUID product;
     @Positive
     int numberOfItems;
 }
@@ -49,11 +74,22 @@ class ReserveStockRequest {
 @Value
 class ReservedStockResponse {
     UUID id;
-    Date expires;
+    UUID branch;
+    UUID product;
+    int numberOfItems;
+    Date createdDate;
+
+    ReservedStockResponse(ReservedStock reserved) {
+        this.id = reserved.getId();
+        this.branch = reserved.getBranch();
+        this.product = reserved.getProduct();
+        this.numberOfItems = reserved.getNumberOfItems();
+        this.createdDate = reserved.getCreatedDate();
+    }
 }
 
 @Value
 @Validated
-class SellRequest{
+class SellRequest {
     UUID id;
 }

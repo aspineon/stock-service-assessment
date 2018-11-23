@@ -13,9 +13,9 @@ interface ReservedStockRepository extends JpaRepository<ReservedStock, UUID> {
 
     List<ReservedStock> findByBranch(UUID branch);
 
-    Optional<ReservedStock> findByProductAndBranch(UUID product, UUID branch);
+    Optional<ReservedStock> findByBranchAndProduct(UUID branch, UUID product);
 
     List<ReservedStock> findByCreatedBy(String createdBy);
 
-    List<ReservedStock> findByExpiresBefore(Date date);
+    List<ReservedStock> findByCreatedDateBefore(Date date);
 }

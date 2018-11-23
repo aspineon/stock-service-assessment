@@ -1,0 +1,3 @@
+insert into STOCK (id, branch, product, number_of_items) values ('158101ba-442e-45b7-ba5b-47395a05f83e', '15336930-43ea-44b3-8414-5b1a379cadc1', '808e7021-17c2-4bd8-a3fa-c320aa1acbad', 12);
+insert into RESERVED_STOCK (id, branch, product, number_of_items, created_by, created_date) values ('a702d244-9d13-4c9d-95ef-5f283d9c52cd', '15336930-43ea-44b3-8414-5b1a379cadc1', '65e75a7f-8cba-4a16-a7ea-e61785f2f6fc', 12, 'testuser', '2000-01-01 00:00:00.01');
+insert into RESERVED_STOCK (id, branch, product, number_of_items, created_by, created_date) values ('d32522a5-68bf-44c6-983b-679d46072093', '15336930-43ea-44b3-8414-5b1a379cadc1', '0e960f5f-7924-4771-b65c-b465d7852b89', 12, 'testuser', '2030-01-01 00:00:00.01');

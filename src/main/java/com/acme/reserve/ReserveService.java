@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -28,7 +29,8 @@ public class ReserveService {
     @Scheduled(fixedRateString = "PT1M")
     @Transactional
     public void returnExpiredToStock() {
-        for (ReservedStock expired : repository.findByExpiresBefore(new Date())) {
+        Date expireCreatedBefore = Date.from(Instant.now().minus(Duration.ofMinutes(30)));
+        for (ReservedStock expired : repository.findByCreatedDateBefore(expireCreatedBefore)) {
             stockService.addToStock(new StockRequest(expired.getBranch(), expired.getProduct(), expired.getNumberOfItems()));
             repository.delete(expired);
         }
@@ -52,7 +54,7 @@ public class ReserveService {
         reservedStock.setBranch(request.getBranch());
         reservedStock.setProduct(request.getProduct());
         reservedStock.setNumberOfItems(request.getNumberOfItems());
-        reservedStock.setExpires(new Date(System.currentTimeMillis() + Duration.ofMinutes(30).toMillis()));
+        reservedStock.setCreatedBy("testuser"); // XXX Have Spring Data set this through @EnableJpaAuditing
         // Return reserved stock with identifier for future reference
         return repository.save(reservedStock);
     }
