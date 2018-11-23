@@ -55,7 +55,6 @@ public class ReservedStockService {
         reservedStock.setBranch(request.getBranch());
         reservedStock.setProduct(request.getProduct());
         reservedStock.setNumberOfItems(request.getNumberOfItems());
-        reservedStock.setCreatedBy("testuser"); // XXX Have Spring Data set this through @EnableJpaAuditing
         // Return reserved stock with identifier for future reference
         return repository.save(reservedStock);
     }
