@@ -77,6 +77,7 @@ class ReservedStockResponse {
     UUID branch;
     UUID product;
     int numberOfItems;
+    String createdBy;
     Date createdDate;
 
     ReservedStockResponse(ReservedStock reserved) {
@@ -84,6 +85,7 @@ class ReservedStockResponse {
         this.branch = reserved.getBranch();
         this.product = reserved.getProduct();
         this.numberOfItems = reserved.getNumberOfItems();
+        this.createdBy = reserved.getCreatedBy();
         this.createdDate = reserved.getCreatedDate();
     }
 }
