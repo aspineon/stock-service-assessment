@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Stock Web Application: Reserved stocks</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<p th:text="'Hello, ' + ${name} + '!'" />
+	<p>
+		Go <a href="/">home</a>
+	</p>
+
+	<h1>Reserved Stock</h1>
+	<table>
+		<tr th:each="reserved: ${reservedstocks}">
+			<td th:text="${reserved.id}" />
+			<td th:text="${reserved.branch}" />
+			<td th:text="${reserved.product}" />
+			<td th:text="${reserved.numberOfItems}" />
+			<td th:text="${reserved.createdBy}" />
+			<td th:text="${reserved.createdDate}" />
+		</tr>
+	</table>
+</body>
+</html>

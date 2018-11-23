@@ -13,12 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 @Service
 @RequiredArgsConstructor
-public class ReserveService {
+public class ReservedStockService {
 
     final StockService stockService;
     final ReservedStockRepository repository;
@@ -72,5 +73,10 @@ public class ReserveService {
         }
         repository.deleteById(request.getId());
         // XXX Consider publishing an event here if we don't end up using @DomainEvents for that
+    }
+
+    public List<ReservedStock> findAll() {
+        // TODO Pageable argument through Spring Data
+        return repository.findAll();
     }
 }

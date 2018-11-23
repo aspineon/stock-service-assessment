@@ -22,7 +22,7 @@ import javax.validation.constraints.Positive;
 @RequestMapping("/reserved-stock")
 class ReserveController {
     final ReservedStockRepository repository;
-    final ReserveService service;
+    final ReservedStockService service;
 
     @PostMapping("/reserve")
     @ResponseStatus(code = HttpStatus.CREATED)

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class StockService {
@@ -38,5 +40,10 @@ public class StockService {
         }
         stock.setNumberOfItems(numberInStock - numberRequested);
         return repository.save(stock);
+    }
+
+    public List<Stock> findAll() {
+        // TODO Pageable argument through Spring Data
+        return repository.findAll();
     }
 }

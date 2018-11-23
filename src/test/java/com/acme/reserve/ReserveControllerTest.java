@@ -29,7 +29,7 @@ public class ReserveControllerTest {
     @MockBean
     ReservedStockRepository repository;
     @MockBean
-    ReserveService service;
+    ReservedStockService service;
     @Autowired
     ObjectMapper mapper;
     @Autowired

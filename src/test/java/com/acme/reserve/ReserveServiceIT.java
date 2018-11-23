@@ -37,7 +37,7 @@ public class ReserveServiceIT {
     @Autowired
     ReservedStockRepository repository;
     @Autowired
-    ReserveService service;
+    ReservedStockService service;
 
     // Taken from /stock-service/src/test/resources/com/acme/reserve/ReserveServiceIT.sql through @Sql above
     UUID branch = UUID.fromString("15336930-43ea-44b3-8414-5b1a379cadc1");

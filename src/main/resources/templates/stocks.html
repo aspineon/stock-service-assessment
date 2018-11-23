@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Stock Web Application: Stocks</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<p th:text="'Hello, ' + ${name} + '!'" />
+	<p>
+		Go <a href="/">home</a>
+	</p>
+
+	<h1>Stock</h1>
+	<table>
+		<tr th:each="stock: ${stocks}">
+			<td th:text="${stock.id}" />
+			<td th:text="${stock.branch}" />
+			<td th:text="${stock.product}" />
+			<td th:text="${stock.numberOfItems}" />
+		</tr>
+	</table>
+</body>
+</html>
