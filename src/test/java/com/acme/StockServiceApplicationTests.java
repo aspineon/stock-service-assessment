@@ -1,4 +1,4 @@
-package com.acme.stock;
+package com.acme;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

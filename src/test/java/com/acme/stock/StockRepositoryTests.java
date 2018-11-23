@@ -11,8 +11,10 @@
  * limitations under the License.
  */
 
-package com.acme.stock.repository;
+package com.acme.stock;
 
+import com.acme.stock.Stock;
+import com.acme.stock.StockRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

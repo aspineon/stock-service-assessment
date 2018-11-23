@@ -8,3 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+  security:
+    user:
+      password: 98436477-3362-402b-b708-d01f8bd21f58
