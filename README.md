@@ -1,4 +1,6 @@
-# Stock service
+# Stock service assessment
+
+For a recent assignment I was asked to complete an assessment to develop a Java web application to manage and reserve stock. The application was to have a CRUD REST API to save, query, change and remove stock for articles. It should also be possible to reserve stock for 30 minutes. This repository contains the unfiltered results of an early morning developing an application according to the above specification.
 
 ## Features
 - Spring Boot 2.1
@@ -16,16 +18,9 @@
 - API documentation snippets generated from on web controller test runs.
 
 ## Notes
-- Regarding the `ReserveController` and `StockController` classes: Spring Data REST can expose much the same methods
-automatically already based on the methods available in the Spring Data repositories. However, that requires careful
-tuning of the methods exposed to prevent unwanted POST/PUT/PATCH/DELETE requests. While I have do so before, I thought
-it out of scope for this quick example.
+- Regarding the `ReserveController` and `StockController` classes: Spring Data REST can expose much the same methods automatically already based on the methods available in the Spring Data repositories. However, that requires careful tuning of the methods exposed to prevent unwanted POST/PUT/PATCH/DELETE requests. While I have done so before, I thought it out of scope for this quick example.
 
-- You'll find I've focused on the backend and exposing a (not yet) REST API; the thymeleaf pages at present only expose
-a quick view on the data stored. My assumption was that any frontend development will mostly be done in a frontend
-framework such as Angular.
+- Regarding test coverage I've mostly tried to demonstrate various test strategies rather than achieve 100% coverage in any particular way. Each have their merits, and you'll usually want a mix of these various approaches.
 
-- Regarding test coverage I've mostly tried to demonstrate various test strategies rather than achieve 100% coverage in
-any particular way. Each have their merits, and you'll usually want a mix of these various approaches.
+- You'll find I've focused on the backend and exposing a (not yet) REST API; the thymeleaf pages at present only expose a quick view on the data stored. My assumption was that any frontend development will mostly be done in a frontend framework such as Angular.
 
-- Regarding Maven pom.xml: While familiar with Gradle, I prefer Maven for consistency across a landscape of services. ;)
